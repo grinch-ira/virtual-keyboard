@@ -11,7 +11,7 @@ export default class Key {
       small === "Ctrl" || code.indexOf(small.slice(1) || false) + 1
     );
 
-    if (shift && shift.match(/[^a-zA-Za-аЯ-ЯёЁ0-9]/g)) {
+    if (shift && shift.match(/[^a-zA-Zа-яА-ЯёЁ0-9]/g)) {
       this.sub = create("div", "sub", this.shift);
     } else {
       this.sub = create("div", "sub", "");

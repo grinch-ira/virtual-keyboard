@@ -63,6 +63,43 @@ export default class Keyboard {
     this.container.onmousedown = this.createCustomEvent;
     this.container.onmouseup = this.createCustomEvent;
   }
+
+  switchUpperCase(isTrue, isShiftKey) {
+    if (isTrue) {
+      if (!this.isCaps) {
+        this.shiftKey = true;
+      }
+      this.keyButtons.forEach((button) => {
+        if (button.sub) {
+          if (!this.isCaps || (this.isCaps && isShiftKey)) {
+            button.sub.classList.add("sub-active");
+          }
+          if (!this.isCaps || (this.isCaps && isShiftKey)) {
+            button.letter.classList.add("sub-inactive");
+          }
+          if (
+            !button.isFnKey &&
+            button.shift &&
+            button.shift.match(/[a-zA-Zа-яА-ЯёЁ0-9]/i)
+          ) {
+            button.letter.innerHTML = button.shift;
+          }
+        }
+      });
+    } else {
+      this.shiftKey = false;
+      this.keyButtons.forEach((button) => {
+        if (button.sub) {
+          button.sub.classList.remove("sub-active");
+          button.letter, classList.remove("sub-inactive");
+          if (!button.isFnKey && !button.sub.value && !this.isCaps) {
+            button.letter.innerHTML = button.small;
+          }
+        }
+      });
+    }
+  }
+
   processKeyDownEvent = (e) => {
     const { code, ctrlKey, shiftKey } = e;
     this.output.focus();
@@ -126,11 +163,9 @@ export default class Keyboard {
     }
   };
 
-resetButtonState = (e)=>{
-  this.resetPressedButtons(e.target.dataset.code)
-}
-
-
+  resetButtonState = (e) => {
+    this.resetPressedButtons(e.target.dataset.code);
+  };
 
   processKeyUpEvent = ({ code }) => {
     const keyObj = this.keyPressed[code];
@@ -150,4 +185,29 @@ resetButtonState = (e)=>{
       }
     }
   };
+
+  resetPressedButtons = (targetCode) => {
+    const pressed = Object.keys(this.keyPressed);
+    clearTimeout(this.timeOut);
+    clearInterval(this.interval);
+    pressed.forEach((code) => {
+      if (
+        targetCode &&
+        targetCode === code &&
+        this.keyPressed[code].small === "Shift"
+      ) {
+        this.shiftKey = false;
+        this.switchUpperCase(false);
+        delete this.keyPressed[code];
+        if (this.keyPressed[code]) {
+          this.keyPressed[code].div.classList.remove("active");
+        }
+      } else if (code === targetCode || code.match(/Alt/)) {
+        this.keyPressed[code].div.classList.remove("active");
+        delete this.keyPressed[code];
+      }
+    });
+  };
 }
+
+
