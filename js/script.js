@@ -1,3 +1,5 @@
+import * as storage from "./Storage.js";
+import Keyboard from "./Keyboard.js";
 
 const rowsOrder = [
   [
@@ -76,4 +78,6 @@ const rowsOrder = [
     "ControlRight",
   ],
 ];
+
+const language = storage.get("kbLang",'"ru"')
 
