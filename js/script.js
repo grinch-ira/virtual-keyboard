@@ -79,5 +79,6 @@ const rowsOrder = [
   ],
 ];
 
-const language = storage.get("kbLang",'"ru"')
+const language = storage.get("kbLang", '"ru"')
 
+new Keyboard(rowsOrder).init(language).generateLayout()

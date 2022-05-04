@@ -10,7 +10,7 @@ const main = create("main", "", [
     "subtitle",
     "the task was completed in the operating system Windows"
   ),
-  create("p", "hint", "To change the language, use Shift + Alt"),
+  create("p", "hint", "To change the language, use Ctrl + Alt"),
 ]);
 
 export default class Keyboard {
@@ -91,7 +91,7 @@ export default class Keyboard {
       this.keyButtons.forEach((button) => {
         if (button.sub) {
           button.sub.classList.remove("sub-active");
-          button.letter, classList.remove("sub-inactive");
+          button.letter.classList.remove("sub-inactive");
           if (!button.isFnKey && !button.sub.value && !this.isCaps) {
             button.letter.innerHTML = button.small;
           }
@@ -211,67 +211,120 @@ export default class Keyboard {
 
 
 
-changeLanguage = () => {
-  const langAbr = Object.keys(language);
-  let langIndex = langAbr.indexOf(this.container.dataset.language)
-  this.keyBase = langIndex + 1 < langAbr.length ? language[lang[++langIndex]] : language[langAbr[(langIndex -= langIndex)]];
+  changeLanguage = () => {
+    const langAbr = Object.keys(language);
+    let langIndex = langAbr.indexOf(this.container.dataset.language)
+    this.keyBase = langIndex + 1 < langAbr.length ? language[langAbr[++langIndex]] : language[langAbr[(langIndex -= langIndex)]];
 
-  this.container.dataset.language = langAbr[langIndex];
-  storage.set("kbLang", langAbr[langIndex]);
+    this.container.dataset.language = langAbr[langIndex];
+    storage.set("kbLang", langAbr[langIndex]);
 
-  this.keyButtons.forEach((button) => {
-    const keyObj = this.keyBase.find((key) => key.code === button.code);
-    if (!keyObj) {
-      return
-    } button.shift = keyObj.shift;
-    button.small = keyObj.small;
-    if (keyObj.shift && keyObj.shift.match(/[^a-zA-Zа-яА-ЯёЁ0-9]/g)) {
-      button.sub.innerHTML = keyObj.shift
-    } else {
-      button.sub.innerHTML = "";
+    this.keyButtons.forEach((button) => {
+      const keyObj = this.keyBase.find((key) => key.code === button.code);
+      if (!keyObj) {
+        return
+      } button.shift = keyObj.shift;
+      button.small = keyObj.small;
+      if (keyObj.shift && keyObj.shift.match(/[^a-zA-Zа-яА-ЯёЁ0-9]/g)) {
+        button.sub.innerHTML = keyObj.shift
+      } else {
+        button.sub.innerHTML = "";
+      }
+      button.letter.innerHTML = keyObj.small;
+      if (!button.isFnKey) {
+        button.letter.classList.toggle("changed")
+      }
+    })
+    if (this.isCaps) {
+      this.switchUpperCase(true)
     }
-    button.letter.innerHTML = keyObj.small;
-    if (!button.isFnKey) {
-      button.letter.classList.toggle("changed")
-    }
-  })
-  if (this.isCaps) {
-    this.switchUpperCase(true)
   }
+
+  createCustomEvent = (event) => {
+    event.preventDefault();
+    const keyDiv = event.target.closest(".keyboard__key");
+    if (!keyDiv) {
+      return
+    }
+    const {
+      dataset: { code },
+    } = event.target.closest(".keyboard__key");
+
+    if (event.type === "mouseup") {
+      if (!this.shiftKey) {
+        this.shiftKey = !!(code === "ShiftLeft" || code === "ShiftRight")
+      }
+      if (code.match(/Control/)) {
+        this.ctrlKey = false;
+      }
+      clearTimeout(this.timeOut);
+      clearInterval(this.interval);
+      this.processKeyUpEvent({ code })
+    } else {
+      if (!this.shiftKey) {
+        this.shiftKey = code === "ShiftLeft" || code === "ShiftRight"
+      }
+      if (!code.match(/Alt|Caps|Control/)) {
+        this.timeOut = setTimeout(() => {
+          this.interval = setInterval(() => {
+            this.processKeyDownEvent({ code })
+          }, 35)
+        }, 500)
+      }
+      this.processKeyDownEvent({ code })
+    }
+    this.output.focus()
+  }
+
+  fireKeyPress(keyObj, symbol) {
+    let cursorPosition = this.output.selectionStart;
+    const left = this.output.value.slice(0, cursorPosition);
+    const right = this.output.value.slice(cursorPosition);
+    const textHandlers = {
+      Tab: () => {
+        this.output.value = `${left}\t${right}`;
+        cursorPosition++;
+      },
+      ArrowLeft: () => {
+        cursorPosition = cursorPosition - 1 >= 0 ? cursorPosition - 1 : 0;
+      },
+      ArrowRight: () => cursorPosition++,
+      ArrowUp: () => {
+        const positionFromLeft = this.output.value
+          .slice(0, cursorPosition)
+          .match(/(\n).*$(?!\1)/g) || [[1]];
+        cursorPosition -= positionFromLeft[0].length;
+      },
+      ArrowDown: () => {
+        const positionFromLeft = this.output.value
+          .slice(cursorPosition)
+          .match(/^.*(\n).*(?!\1)/) || [[1]];
+        cursorPosition += positionFromLeft[0].length + 1;
+      },
+      Enter: () => {
+        this.output.value = `${left}\n${right}`;
+        cursorPosition++;
+      },
+      Delete: () => {
+        this.output.value = `${left}${right.slice(1)}`;
+      },
+      Backspace: () => {
+        this.output.value = `${left.slice(0, -1)}${right}`;
+        cursorPosition--;
+      },
+      Space: () => {
+        this.output.value = `${left} ${right}`;
+        cursorPosition += 1;
+      },
+    };
+    if (textHandlers[keyObj.code]) textHandlers[keyObj.code]();
+    else if (!keyObj.isFnKey) {
+      cursorPosition += 1;
+      this.output.value = `${left}${symbol || ""}${right}`;
+    }
+    this.output.setSelectionRange(cursorPosition, cursorPosition);
+  }
+
 }
 
-generateCustomEvent = (event) => {
-  event.preventDefault();
-  const keyDiv = event.target.closest(".keyboard__key");
-  if (!keyDiv) {
-    return
-  }
-  const {
-    dataset: { code },
-  } = event.target.closest(".keyboard__key");
 
-  if (event.type === "mouseup") {
-    if (!this.shiftKey) {
-      this.shiftKey = !!(code === "ShiftLeft" || code === "ShiftRight")
-    }
-    if (code.match(/Control/)) {
-      this.ctrlKey = false;
-    }
-    clearTimeout(this.timeOut);
-    clearInterval(this.interval);
-    this.processKeyUpEvent({ code })
-  } else {
-    if (!this.shiftKey) {
-      this.shiftKey = code === "ShiftLeft" || code === "ShiftRight"
-    }
-    if (!code.match(/Alt|Caps|Control/)) {
-      this.timeOut = setTimeout(() => {
-        this.interval = setInterval(() => {
-          this.processKeyDownEvent({ code })
-        }, 35)
-      }, 500)
-    }
-    this.processKeyDownEvent({ code })
-  }
-  this.outp.focus()
-}}

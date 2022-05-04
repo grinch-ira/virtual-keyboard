@@ -1,4 +1,4 @@
-export default function create(el, classNames, child, parent, ...dataAttr) {
+export default function create(el, classNames = "", child, parent, ...dataAttr) {
   let element = null;
 
   try {
@@ -16,7 +16,7 @@ export default function create(el, classNames, child, parent, ...dataAttr) {
     });
   } else if (child && typeof child === "object") {
     element.appendChild(child);
-  } else if (child && typeof child === "string") {
+  } else if ( typeof child === "string") {
     element.innerHTML = child;
   }
 
@@ -28,6 +28,7 @@ export default function create(el, classNames, child, parent, ...dataAttr) {
     dataAttr.forEach(([attrName, attrValue]) => {
       if (attrValue === "") {
         element.setAttribute(attrName, "");
+        return;
       }
       if (
         attrName.match(/value|id|placeholder|cols|rows|autocorrect|spellcheck/)
