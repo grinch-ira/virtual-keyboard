@@ -100,15 +100,15 @@ export default class Keyboard {
     }
   }
 
-  processKeyDownEvent = (e) => {
-    const { code, ctrlKey, shiftKey } = e;
+  processKeyDownEvent = (event) => {
+    const { code, ctrlKey, shiftKey } = event;
     this.output.focus();
     const keyObj = this.keyButtons.find((key) => key.code === code);
     if (keyObj) {
-      if (!e.type && keyObj.isFnKey && keyObj.small === "Shift") {
+      if (!event.type && keyObj.isFnKey && keyObj.small === "Shift") {
         this.shiftKey = true;
       }
-      if (e.type && keyObj.isFnKey && keyObj.small === "Shift") {
+      if (event.type && keyObj.isFnKey && keyObj.small === "Shift") {
         this.shiftKey = true;
       }
       if (keyObj.small === "Shift") {
@@ -117,16 +117,16 @@ export default class Keyboard {
       if (keyObj.code.match(/Caps/) && !this.isCaps) {
         this.isCaps = true;
         this.switchUpperCase(true);
-      } else if (keyObj.code.match(/Caps/) && this.isCaps && !e.repeat) {
+      } else if (keyObj.code.match(/Caps/) && this.isCaps && !event.repeat) {
         this.isCaps = false;
         this.switchUpperCase(false);
       }
-      if (!e.type && keyObj.code.match(/Control/) && keyObj.isFnKey) {
+      if (!event.type && keyObj.code.match(/Control/) && keyObj.isFnKey) {
         this.ctrlKey = true;
       }
       if (keyObj.code.match(/Alt/g) && (ctrlKey || this.ctrlKey)) {
-        if (e.type) {
-          e.preventDefault();
+        if (event.type) {
+          event.preventDefault();
           this.changeLanguage();
         }
       }
@@ -135,10 +135,10 @@ export default class Keyboard {
       if (
         (!keyObj.isFnKey && !ctrlKey) ||
         keyObj.code.match(/Tab|Alt/) ||
-        (!e.type && keyObj.code.match(regexp))
+        (!event.type && keyObj.code.match(regexp))
       ) {
-        if (e.type) {
-          e.preventDefault();
+        if (event.type) {
+          event.preventDefault();
         }
         this.fireKeyPress(
           keyObj,
@@ -155,7 +155,7 @@ export default class Keyboard {
       }
       keyObj.div.classList.add("active");
       this.keyPressed[keyObj.code] = keyObj;
-      if (!e.type) {
+      if (!event.type) {
         keyObj.div.addEventListener("mouseleave", this.resetButtonState, {
           once: true,
         });
@@ -163,8 +163,8 @@ export default class Keyboard {
     }
   };
 
-  resetButtonState = (e) => {
-    this.resetPressedButtons(e.target.dataset.code);
+  resetButtonState = (event) => {
+    this.resetPressedButtons(event.target.dataset.code);
   };
 
   processKeyUpEvent = ({ code }) => {
@@ -208,7 +208,7 @@ export default class Keyboard {
       }
     });
   };
-}
+
 
 
 changeLanguage = () => {
@@ -220,7 +220,7 @@ changeLanguage = () => {
   storage.set("kbLang", langAbr[langIndex]);
 
   this.keyButtons.forEach((button) => {
-    const keyObj = this.keuBase.find((key) => key.code === button.code);
+    const keyObj = this.keyBase.find((key) => key.code === button.code);
     if (!keyObj) {
       return
     } button.shift = keyObj.shift;
@@ -240,3 +240,38 @@ changeLanguage = () => {
   }
 }
 
+generateCustomEvent = (event) => {
+  event.preventDefault();
+  const keyDiv = event.target.closest(".keyboard__key");
+  if (!keyDiv) {
+    return
+  }
+  const {
+    dataset: { code },
+  } = event.target.closest(".keyboard__key");
+
+  if (event.type === "mouseup") {
+    if (!this.shiftKey) {
+      this.shiftKey = !!(code === "ShiftLeft" || code === "ShiftRight")
+    }
+    if (code.match(/Control/)) {
+      this.ctrlKey = false;
+    }
+    clearTimeout(this.timeOut);
+    clearInterval(this.interval);
+    this.processKeyUpEvent({ code })
+  } else {
+    if (!this.shiftKey) {
+      this.shiftKey = code === "ShiftLeft" || code === "ShiftRight"
+    }
+    if (!code.match(/Alt|Caps|Control/)) {
+      this.timeOut = setTimeout(() => {
+        this.interval = setInterval(() => {
+          this.processKeyDownEvent({ code })
+        }, 35)
+      }, 500)
+    }
+    this.processKeyDownEvent({ code })
+  }
+  this.outp.focus()
+}}
