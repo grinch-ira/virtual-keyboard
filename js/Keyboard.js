@@ -127,7 +127,7 @@ export default class Keyboard {
       if (keyObj.code.match(/Alt/g) && (ctrlKey || this.ctrlKey)) {
         if (e.type) {
           e.preventDefault();
-          this.switchLanguage();
+          this.changeLanguage();
         }
       }
       const regexp =
@@ -210,4 +210,33 @@ export default class Keyboard {
   };
 }
 
+
+changeLanguage = () => {
+  const langAbr = Object.keys(language);
+  let langIndex = langAbr.indexOf(this.container.dataset.language)
+  this.keyBase = langIndex + 1 < langAbr.length ? language[lang[++langIndex]] : language[langAbr[(langIndex -= langIndex)]];
+
+  this.container.dataset.language = langAbr[langIndex];
+  storage.set("kbLang", langAbr[langIndex]);
+
+  this.keyButtons.forEach((button) => {
+    const keyObj = this.keuBase.find((key) => key.code === button.code);
+    if (!keyObj) {
+      return
+    } button.shift = keyObj.shift;
+    button.small = keyObj.small;
+    if (keyObj.shift && keyObj.shift.match(/[^a-zA-Zа-яА-ЯёЁ0-9]/g)) {
+      button.sub.innerHTML = keyObj.shift
+    } else {
+      button.sub.innerHTML = "";
+    }
+    button.letter.innerHTML = keyObj.small;
+    if (!button.isFnKey) {
+      button.letter.classList.toggle("changed")
+    }
+  })
+  if (this.isCaps) {
+    this.switchUpperCase(true)
+  }
+}
 
