@@ -1,0 +1,237 @@
+/*Обнуление*/
+* {
+    padding: 0;
+    margin: 0;
+    border: 0;
+  }
+  
+  *,
+  *:before,
+  *:after {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+  }
+  
+  :focus,
+  :active {
+    outline: none;
+  }
+  
+  a:focus,
+  a:active {
+    outline: none;
+  }
+  
+  nav,
+  footer,
+  header,
+  aside {
+    display: block;
+  }
+  
+  html,
+  body {
+    height: 100%;
+    width: 100%;
+    font-size: 100%;
+    line-height: 1;
+    font-size: 14px;
+    -ms-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  input,
+  button,
+  textarea {
+    font-family: inherit;
+  }
+  
+  input::-ms-clear {
+    display: none;
+  }
+  
+  button {
+    cursor: pointer;
+  }
+  
+  button::-moz-focus-inner {
+    padding: 0;
+    border: 0;
+  }
+  
+  a,
+  a:visited {
+    text-decoration: none;
+  }
+  
+  a:hover {
+    text-decoration: none;
+  }
+  
+  ul li {
+    list-style: none;
+  }
+  
+  img {
+    vertical-align: top;
+  }
+  
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-size: inherit;
+    font-weight: 400;
+  }
+  
+  body {
+    height: 100%;
+    line-height: 1;
+    font-family: Montserrat;
+    font-weight: 500;
+    background: #fafafa;
+  }
+  
+  /*Конец обнуления*/
+
+
+  body{
+    background-color: #f3b5f3;
+
+  }
+  main{
+    max-width: 1020px;
+    margin: auto;
+    overflow: hidden;
+  }
+  .keyboard{
+    display: grid;
+    grid-row-gap:10px;
+    padding: 10px;
+    border: 1px solid;
+    position: relative;
+    overflow: hidden;
+    background-color: #634863;
+    border-radius: 5px;
+    border: 3px solid black;
+  }
+
+  .keyboard__row{
+    display: grid;
+    grid-gap: 10px;
+    grid-row-gap: 10px;
+    height: 50px;
+  }
+
+  .keyboard__key{
+    display: flex;
+    cursor: pointer;
+    border-radius: 5px;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color:#b4abb4;
+    box-shadow: inset rgba(0,0,0,.75) -1px -1px 2px, inset rgba(255,255,255,.9) 1px 1px 2px, rgba(0,0,0,.8) 1px 1px 2px -1px;
+    transition: all 0.2s ease;
+  }
+
+  [data-fn="false"].active {
+    box-shadow: inset 0px 1px 2px 1px rgba(0,0,0,.9), inset 0 0 20px 2em rgba(255,255,255,.2);
+  }
+  
+  [data-fn="true"].active {
+    box-shadow: inset 0px 1px 2px 1px rgba(0,0,0,.9), inset 0 0 20px 2em rgba(255,255,255, 0);
+  }
+  
+  [data-fn="false"].active .letter,
+  [data-fn="true"].active .letter {
+    transform: translateY(1px)  ;
+    -webkit-transform: translateY(1px)  ;
+    -moz-transform: translateY(1px)  ;
+    -ms-transform: translateY(1px)  ;
+    -o-transform: translateY(1px)  ;
+    color: #244618;
+  }
+  
+  [data-fn="true"] {
+    background: rgb(78, 78, 78) radial-gradient(circle at 0 0, rgba(136, 134, 134, 0.65), rgba(167, 167, 167, 0.35));
+    box-shadow: inset rgba(0,0,0,.75) -1px -1px 2px, inset rgba(161, 160, 160, 0.9) 1px 1px 2px, rgba(0,0,0,.8) 1px 1px 2px -1px;
+  }
+  
+  [data-fn="true"] > .letter {
+    font-size: 16px;
+  }
+  
+  [data-code="CapsLock"] {
+    width: 86px;
+  }
+  
+  [data-code="ShiftLeft"] {
+    width: 100px;
+  }
+  
+  [data-code="ShiftRight"] {
+    width: 120px;
+  }
+  
+  [data-code="Enter"] {
+    width: 100px;
+  }
+  
+  [data-code="Tab"] {
+    width: 76px;
+  }
+  
+  [data-code="ControlLeft"] {
+    width: 76px;
+  }
+  
+  [data-code="ControlRight"] {
+    width: 60px;
+  }
+  
+  [data-code="Backspace"] {
+    width: 115px;
+  }
+  
+  [data-code="Space"] {
+    width: 420px;
+  }
+  
+  [data-code="AltLeft"],
+  [data-code="AltRight"] {
+    width: 76px;
+  }
+.active{
+  background-color: #f3b5f3;
+}
+ .subtitle, .hint{
+  font-size: 20px;
+  margin: 0 0 15px 15px;
+}
+
+.letter{
+  font-size: 25px;
+  width: 100%;
+  text-align: center;
+  transition: all 0.2s ease;
+  transform-origin: center;
+}
+.title{
+  font-size: 35px;
+  font-family: Georgia, 'Times New Roman', Times, serif;
+  margin: 15px;
+}
+
+textarea.output{
+  resize: none;
+  width: 100%;
+  height: 250px;
+  margin-bottom: 15px;
+  padding: 15px;
+  font-size: 20px;
+} 
