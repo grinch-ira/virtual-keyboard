@@ -16,7 +16,7 @@ export default function create(el, classNames = "", child, parent, ...dataAttr) 
     });
   } else if (child && typeof child === "object") {
     element.appendChild(child);
-  } else if ( typeof child === "string") {
+  } else if (typeof child === "string") {
     element.innerHTML = child;
   }
 
